@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document Assistant</title>
+    <meta name="description" content="Chat with your documents. Upload PDFs, DOCX, TXT, and audio files for intelligent retrieval-augmented generation." />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+    <div class="app-container" id="app">
+        <!-- ═══ Sidebar ═══ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo" id="logo">
+                    <div class="logo-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-title">Document Assistant</span>
+                    </div>
+                </div>
+                <button class="sidebar-toggle-btn" id="sidebarCloseBtn" title="Close sidebar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Upload Zone -->
+            <div class="upload-section">
+                <div class="upload-dropzone" id="dropzone">
+                    <div class="dropzone-content">
+                        <div class="dropzone-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </div>
+                        <p class="dropzone-text">Drop files here</p>
+                        <p class="dropzone-hint">PDF, DOCX, TXT, Audio</p>
+                    </div>
+                    <div class="dropzone-active-overlay">
+                        <div class="dropzone-active-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </div>
+                        <span>Release to upload</span>
+                    </div>
+                </div>
+                <input type="file" id="fileInput" multiple accept=".pdf,.docx,.txt,.md,.csv,.mp3,.wav,.m4a,.flac,.ogg" hidden />
+                <button class="upload-btn" id="uploadBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Browse Files
+                </button>
+            </div>
+
+            <!-- Upload Progress -->
+            <div class="upload-progress" id="uploadProgress" hidden>
+                <div class="progress-info">
+                    <span class="progress-filename" id="progressFilename">file.pdf</span>
+                    <span class="progress-percent" id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-status" id="progressStatus">Uploading…</div>
+            </div>
+
+            <!-- Document List -->
+            <div class="documents-section">
+                <div class="documents-header">
+                    <h3>Knowledge Base</h3>
+                    <span class="doc-count-badge" id="docCountBadge">0</span>
+                </div>
+                <div class="documents-list" id="documentsList">
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round">
+                                <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2v11z"/>
+                            </svg>
+                        </div>
+                        <p>No documents yet</p>
+                        <span>Upload files to start chatting</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="sidebar-footer">
+                <div class="stat-item">
+                    <span class="stat-value" id="totalDocs">0</span>
+                    <span class="stat-label">Documents</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-value" id="totalChunks">0</span>
+                    <span class="stat-label">Chunks</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-value" id="statusDot">
+                        <span class="status-dot" id="connectionDot"></span>
+                    </span>
+                    <span class="stat-label" id="connectionLabel">Checking…</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Sidebar Toggle -->
+        <button class="sidebar-mobile-toggle" id="sidebarOpenBtn" title="Open sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M3 12h18M3 6h18M3 18h18"/>
+            </svg>
+        </button>
+
+        <!-- ═══ Main Chat Area ═══ -->
+        <main class="main-content">
+            <header class="chat-header">
+                <div class="chat-header-left">
+                    <h1>Chat with your documents</h1>
+                    <p class="chat-header-subtitle">Ask anything about your uploaded knowledge base</p>
+                </div>
+                <div class="chat-header-right">
+                    <button class="clear-chat-btn" id="clearChatBtn" title="Clear chat history">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                        Clear
+                    </button>
+                </div>
+            </header>
+
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Message -->
+                <div class="welcome-card" id="welcomeCard">
+                    <div class="welcome-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                        </svg>
+                    </div>
+                    <h2>How can I help you today?</h2>
+                    <p>Upload your documents and start asking questions. I'll find the most relevant information and generate accurate answers with source citations.</p>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper" id="chatInputWrapper">
+                    <textarea
+                        id="chatInput"
+                        placeholder="Ask a question about your documents…"
+                        rows="1"
+                        disabled
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn" disabled title="Send message">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                    </button>
+                </div>
+                <p class="input-hint" id="inputHint">
+                    <span id="inputHintText">Upload documents to start chatting</span>
+                    <span class="kbd-hints" id="kbdHints" hidden>
+                        <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line
+                    </span>
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
